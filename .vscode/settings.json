@@ -1,5 +1,6 @@
 {
     "conventionalCommits.scopes": [
-        "dataset"
+        "dataset",
+        "model"
     ]
 }
