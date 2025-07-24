@@ -1,6 +1,6 @@
-path: images
-train: /train
-val:  /validation
+path: YOLOV8/images
+train: train
+val: validation
 
 #classes
 names:
