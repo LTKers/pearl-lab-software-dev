@@ -1,0 +1,10 @@
+path: images
+train: /train
+val:  /validation
+
+#classes
+names:
+  0: Red_Block
+  1: Blue_Block
+  2: Yellow_Block
+  3: Green_Block
