@@ -1,6 +1,6 @@
-path: YOLOV8/images
-train: train
-val: validation
+path: datasets
+train: images/train
+val: images/validation
 
 #classes
 names:
