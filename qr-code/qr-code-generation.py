@@ -11,8 +11,8 @@ qr=qrcode.QRCode(version=1, error_correction=qrcode.ERROR_CORRECT_H, box_size=50
 
 #Creates QRCode image using input and saves into images directory
 block_name=input("Enter block name")
-version=input("Enter QR code version")
 
 qr.add_data(block_name)
 img = qr.make_image(image_factory=qrcode.image.pure.PyPNGImage, fill_color="black", back_color="white")
-imgsave=img.save(f'qr-code/images/version{version}/{block_name}.png')
+path=os.path.join("images", f"{block_name}.png")
+img.save(path)
