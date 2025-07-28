@@ -3,6 +3,7 @@
         "dataset",
         "model",
         "frontend",
-        "QR"
+        "QR",
+        "AprilTag"
     ]
 }
