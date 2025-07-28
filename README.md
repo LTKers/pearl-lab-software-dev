@@ -9,4 +9,10 @@ Bootle Blast is a theraputic game desgined by Pearl Lab at Holland Bloorview Kid
 built in unity
 
 The purpose of this repository is to develop modern tools for computer vision
-To learn more about Pearl Lab, Bootle Blast's minigames, and in game lore, click [here]([url](https://hollandbloorview.ca/research-education/bloorview-research-institute/research-centres-labs/pearl-lab)).
+To learn more about Pearl Lab, Bootle Blast's minigames, and in game lore, click [here](https://hollandbloorview.ca/research-education/bloorview-research-institute/research-centres-labs/pearl-lab).
+
+
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
