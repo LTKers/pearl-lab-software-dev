@@ -5,7 +5,7 @@ from qr_code_block_detector import detect_qr
 # Open webcam
 cap = cv.VideoCapture(0)
 
-zoom_factor = 4
+zoom_factor = 5
 margin=20.   #unit in pixels
 
 while True:
@@ -24,11 +24,7 @@ while True:
                    [-1, 5,-1],
                    [0, -1, 0]]) 
     
-
-
     sharpened = cv.filter2D(blur, -1, kernel)
-
-
 
      # Edge detection
     # Threshold to get binary image
@@ -62,7 +58,7 @@ while True:
             if roi.size == 0:
                 continue
             
-            zoomed_roi = cv.resize(roi, ((int(x2_exp) - int(x_exp)) * zoom_factor, (int(y2_exp) - int(y_exp)) * zoom_factor), interpolation=cv.INTER_LINEAR)
+            zoomed_roi = cv.resize(roi, ((int(x2_exp) - int(x_exp)) * zoom_factor, (int(y2_exp) - int(y_exp)) * zoom_factor), interpolation=cv.INTER_CUBIC)
 
             detections = detect_qr(zoomed_roi)
 
