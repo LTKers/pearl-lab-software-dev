@@ -21,11 +21,12 @@ while True:
 
     for detection in detections:
         print("yo")
-        pts = np.array(detection["points"], dtype=np.float32)
+        pts = detection["points"]
         color = detection["bgr_colour"]
         cv.polylines(frame, [pts], True, color, 2)
         cv.putText(frame, detection["text_colour"], (pts[0][0], pts[0][1] + 30), cv.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
-    
+
+        
     cv.imshow("QR Detection", frame)
 
     if cv.waitKey(1) & 0xFF == ord('q'):
