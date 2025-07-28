@@ -5,7 +5,7 @@ from qr_code_block_detector import detect_qr
 # Open webcam
 cap = cv.VideoCapture(0)
 
-zoom_factor = 4 
+zoom_factor = 4
 margin=20.   #unit in pixels
 
 while True:

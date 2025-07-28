@@ -18,8 +18,10 @@ def detect_qr(frame):
                 bgr_colour = (255, 0, 0)
             elif text_colour == 'green':
                 bgr_colour = (0, 255, 0)
-            else:
+            elif text_colour == 'yellow':
                 bgr_colour = (0, 255, 255)
+            else:
+                bgr_colour= (255, 255, 255)
 
             results.append({
                 "text_colour": text_colour,
