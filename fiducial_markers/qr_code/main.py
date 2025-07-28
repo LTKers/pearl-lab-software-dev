@@ -5,8 +5,14 @@ from qr_code_block_detector import detect_qr
 # Open webcam
 cap = cv.VideoCapture(0)
 
+zoom_factor = 4 
+margin=20.   #unit in pixels
+
 while True:
     success, frame = cap.read()
+
+    height, width = frame.shape[:2]
+
     if not success:
         print("Failed to grab frame.")
         break
@@ -42,32 +48,38 @@ while True:
 
     for cnt in contours:
         area = cv.contourArea(cnt)
-        if area > 1500:  # filter out small noise
+        if area > 2000 and area <100000:  # filter out small noise
             cv.drawContours(frame_with_contours, [cnt], -1, (0, 255, 0), 2)
             x, y, w, h = cv.boundingRect(cnt)
-            cv.rectangle(frame, (x, y), (x+w, y+h), (0,255,0), 4)
-    # Show outputs
-    cv.imshow("Contours", frame_with_contours)
-    cv.imshow("frame", frame)
+
+            x_exp = max(x - margin, 0)
+            y_exp = max(y - margin, 0)
+            x2_exp = min(x + w + margin, width)
+            y2_exp = min(y + h + margin, height)
 
 
+            roi = frame[int(y_exp):int(y2_exp), int(x_exp):int(x2_exp)]
+            if roi.size == 0:
+                continue
+            
+            zoomed_roi = cv.resize(roi, ((int(x2_exp) - int(x_exp)) * zoom_factor, (int(y2_exp) - int(y_exp)) * zoom_factor), interpolation=cv.INTER_LINEAR)
 
-    ret, bw_im = cv.threshold(sharpened, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
-    detections = detect_qr(bw_im)
+            detections = detect_qr(zoomed_roi)
 
+            for detection in detections:
+                pts = np.array(detection["points"], dtype=np.float32)
+                pts /= zoom_factor
+
+                pts[:, 0] += x_exp
+                pts[:, 1] += y_exp
+                pts = pts.astype(np.int32)
+
+                color = detection["bgr_colour"]
+                cv.polylines(frame, [pts], True, color, 2)
+                cv.putText(frame, detection["text_colour"], (pts[0][0], pts[0][1] + 30), cv.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
     
-    for detection in detections:
-        text_colour=detection["text_colour"]
-        pts = detection["points"]
-        bgr_color = detection["bgr_colour"]
-
-        cv.polylines(frame, [pts], True, bgr_color, 2)
-        pt = tuple(pts[0])
-        cv.putText(frame, text_colour, (pt[0], pt[1] + 30), cv.FONT_HERSHEY_SIMPLEX, 0.7, bgr_color, 2)
-
     cv.imshow("QR Detection", frame)
 
-    cv.imshow("bw", bw_im)
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
 

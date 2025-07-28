@@ -21,17 +21,25 @@ div#hcontainer{
 div#vcontainer{
     display:flex;
     flex-direction: column;
-    
+    max-width: 50vw;
+
 }
-div#additional-text{
-    background: 292e42;
-    border: 2px solid #73AD21;
-    margin: 0px;
-    border-radius:25px;
-    flex: 1 1 0;
+div#additional-text-holder {
+    border-radius: 30px;
+    padding: 5px; 
     margin: 35px;
-    
+    flex: 1 1 0;
+
+    background: linear-gradient(90deg, #7dcfff 0%, #5ad1ff 60%, #9bdcff 100%);
+    box-shadow: 0 0 8px rgba(125, 207, 255, 0.6);
 }
+
+div#additional-text-content {
+    border-radius: 25px; 
+    background: #292e42;
+    padding: 10px 5px 5px 10px;
+}
+
 
 div#display-area{
     background: blue;
@@ -88,9 +96,16 @@ img#logo{
 
 
 p{
-    white-space: normal;
+  white-space: normal;
   word-wrap: break-word;
-
+  color:  #7aa2f7;
+  background: linear-gradient(90deg, #7dcfff 0%, #5ad1ff 60%, #9bdcff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;          /* Standard */
+  color: transparent;  
+  margin: 0 0 5px 5px;
+  align-self: center;
 }
 html{
     background: #292e42;

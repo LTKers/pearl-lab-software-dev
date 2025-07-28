@@ -2,6 +2,7 @@
     "conventionalCommits.scopes": [
         "dataset",
         "model",
-        "frontend"
+        "frontend",
+        "QR"
     ]
 }
