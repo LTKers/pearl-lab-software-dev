@@ -1,12 +1,14 @@
 import cv2 as cv
 import numpy as np
 from qr_code_block_detector import detect_qr
+import time
 
 # Open webcam
 cap = cv.VideoCapture(0)
+previous_time = time.time()
 
 zoom_factor = 5
-margin=20.   #unit in pixels
+margin=20
 
 while True:
     success, frame = cap.read()
@@ -16,8 +18,14 @@ while True:
     if not success:
         print("Failed to grab frame.")
         break
-
-    #Gray Scale
+    
+    # Fps calc + display
+    current_time = time.time()
+    fps = 1 / (current_time - previous_time)
+    previous_time= current_time
+    cv.putText(frame, f"FPS: {fps:.2f}", (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    
+    # Preprocessing
     gray_img=cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
     blur = cv.GaussianBlur(gray_img, (3, 3), 0)
     kernel = np.array([[0, -1, 0],
@@ -25,26 +33,19 @@ while True:
                    [0, -1, 0]]) 
     
     sharpened = cv.filter2D(blur, -1, kernel)
-
-     # Edge detection
-    # Threshold to get binary image
     _, thresh = cv.threshold(sharpened, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
-
-    # Invert (if QR code is black on white background)
     inverted = cv.bitwise_not(thresh)
 
-    # Dilate to merge small components (square kernel maintains shape)
     kernel = np.ones((15, 15), np.uint8)
     dilated = cv.dilate(inverted, kernel, iterations=1)
 
-    # Now you can find contours
     contours, _ = cv.findContours(dilated, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 
     frame_with_contours = frame.copy()
 
     for cnt in contours:
         area = cv.contourArea(cnt)
-        if area > 2000 and area <100000:  # filter out small noise
+        if area > 2000 and area <100000:  
             cv.drawContours(frame_with_contours, [cnt], -1, (0, 255, 0), 2)
             x, y, w, h = cv.boundingRect(cnt)
 

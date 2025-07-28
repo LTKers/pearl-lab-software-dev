@@ -1,9 +1,11 @@
 import cv2 as cv
 import numpy as np
+import time
 from apriltag_detector import detect_apriltag
 
 # Open webcam
 cap = cv.VideoCapture(0)
+previous_time = time.time()
 
 
 while True:
@@ -13,10 +15,15 @@ while True:
     if not ret:
         print("Failed to grab frame.")
         break
+    
+     # Fps calc + display
+    current_time = time.time()
+    fps = 1 / (current_time - previous_time)
+    previous_time= current_time
+    cv.putText(frame, f"FPS: {fps:.2f}", (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
     #Gray Scale
     gray_img=cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-
     detections = detect_apriltag(gray_img)
 
     for detection in detections:
