@@ -4,6 +4,8 @@
         "model",
         "frontend",
         "QR",
-        "AprilTag"
+        "AprilTag",
+        "Media",
+        "media"
     ]
 }
