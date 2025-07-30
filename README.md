@@ -44,10 +44,10 @@ I trained a **YOLOv8** model to detect colored blocks using a custom dataset of 
 
    These variations were intentional to help the YOLOv8 model generalize better and perform accurately in real-world scenarios.
 
-1. **Camera**
+2. **Camera**
   Images were captured using both a 3D Orbbec Persee camera and a standard 2D webcam. This combination allowed us to gather diverse visual data, including depth-aware and RGB-only perspectives,     enhancing the robustness of the training dataset.
   
-4. **Image Annotation via [CVAT.ai](https://cvat.ai)**  
+3. **Image Annotation via [CVAT.ai](https://cvat.ai)**  
    - Annotated over **150+ images**, each image has at least 3 instances of a block.
    - There are four classes: red, blue, yellow and green.
    - Exported in YOLO format for training
