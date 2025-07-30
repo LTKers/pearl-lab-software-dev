@@ -77,6 +77,7 @@ while True:
     
     cv.imshow("QR Detection", frame)
 
+
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
 
