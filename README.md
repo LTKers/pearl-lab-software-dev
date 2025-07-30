@@ -79,6 +79,62 @@ A lightweight demo was developed to run the trained YOLOv8 model in real-time:
 </p>
 
 
+## 🎯 Fiducial Markers
+
+Fiducial markers were used to uniquely identify blocks in the scene for detection and classification. They offer the advantage of not relying on colour, which is highly distorted by differing lighting settings. However, they are affected more by occlusion. Two types were explored: **QR codes** and **AprilTags**.
+
+---
+
+## QR Codes
+
+QR codes were initially tested due to their widespread recognition and built-in data encoding. For detection, OpenCV’s `QRCodeDetector` was used to generate, identify, and decode the markers. Each QR code was encoded with the corresponding block color, allowing the system to read and associate color data directly from the code. Due to the small size of the blocks, the QR codes were printed to be 4 cm per dimension.
+
+<p align="center">
+  <img src=" " alt="QR Labeling" width="500"/>
+</p>
+
+However, QR codes proved to be extremely unreliable:
+- Inconsistent detection when viewed at an angle or in low-light conditions  
+- Limited range, with small codes becoming undetectable beyond half a meter  
+- Unstable tracking, often flickering in and out of detection even when stationary
+
+To improve the performance of the algorhtimn, more steps were taken in preprocessing:
+
+1. **Grayscale Conversion:**  
+   The original color frame is converted to grayscale to simplify processing.
+2. **Gaussian Blur:**  
+   A small blur is applied to reduce noise and smooth the image.
+3. **Sharpening Filter:**  
+   A custom kernel enhances edges to emphasize fiducial markers.
+4. **Otsu Thresholding:**  
+   Adaptive binary thresholding converts the image to black and white based on intensity.
+5. **Inversion:**  
+   The binary image is inverted to highlight the markers as white on a dark background.
+6. **Dilation:**  
+   A morphological dilation with a large kernel is applied to close gaps and strengthen shapes.
+7. **Contour Detection:**  
+   External contours are found in the processed image, filtered by area to exclude noise.
+8. **Region of Interest (ROI) Zoom:**  
+   Each valid contour is expanded with a margin and zoomed in.
+9. **Detect and Drawing Results:**  
+   The detecti=ion is run on every zoomed in countour. If a detection occurs, a border is drawn around it and the data is decoded.
+
+
+While preprocessing significantly improved the effective detection range to approximately **1.3 meters**, it came with a tradeoff: increased computational cost. The zoom operation combined with running detection on multiple cropped regions made the pipeline resource-intensive, limiting performance on lower-end systems.
+
+## AprilTags
+
+AprilTags, specifically from the `tag16h5` family, were used as the primary fiducial system. These markers are designed for robust visual detection under a variety of conditions and provide unique IDs for each tag.
+
+- High contrast design enables **accurate detection at various angles and distances**  
+- Tags were **physically printed and affixed to blocks**, making them easily distinguishable  
+- Well-supported by pose estimation libraries for future applications (e.g., 3D localization)
+
+<p align="center">
+  <img src="./images/apriltags-example.png" alt="AprilTags Example" width="400"/>
+</p>
+
+AprilTags offered superior performance compared to QR codes, especially in dynamic or partially occluded environments, and were therefore used for all final annotations and training.
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
