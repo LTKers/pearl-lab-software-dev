@@ -25,15 +25,26 @@ I trained a **YOLOv8** model to detect colored blocks using a custom dataset of 
 
 ### Data Collection
 
-1. **Environment Setup**  
+1. **Environment Setup**
+   To mimic diverse real-life conditions, a controlled setup replicating a standard living room was used.
+   
+  <p align="center">
+    <img src="media/enviro.jpeg" alt="Enviro1" width="500"/>
+  </p>
+  
    To mimic diverse real-life conditions, photos were captured under a wide range of settings:
    - Distance: Near and far from the camera
    - Lighting: Bright, dim, single lamp, double lamps, natural light from windows
    - Visibility: With and without occlusion (e.g., partially blocked fiducial markers)
 
+  <p align="center">
+    <img src="media/enviro2.jpeg" alt="Enviro1" width="500"/>
+    <img src="media/enviro3.jpeg" alt="Enviro1" width="500"/>
+  </p>
+
    These variations were intentional to help the YOLOv8 model generalize better and perform accurately in real-world scenarios.
 
-2. **Camera**
+1. **Camera**
   Images were captured using both a 3D Orbbec Persee camera and a standard 2D webcam. This combination allowed us to gather diverse visual data, including depth-aware and RGB-only perspectives,     enhancing the robustness of the training dataset.
   
 4. **Image Annotation via [CVAT.ai](https://cvat.ai)**  
@@ -43,7 +54,7 @@ I trained a **YOLOv8** model to detect colored blocks using a custom dataset of 
 
      
 <p align="center">
-  <img src="./images/cvat-labeling.png" alt="CVAT Labeling" width="500"/>
+  <img src="media/cvat.png" alt="CVAT Labeling" width="500"/>
 </p>
 
 
