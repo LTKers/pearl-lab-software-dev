@@ -63,6 +63,9 @@ I trained a **YOLOv8** model to detect colored blocks using a custom dataset of 
 
 YOLOv8 was selected for its high speed and accuracy in real-time object detection tasks. The training process was carried out using the Ultralytics Python interface, which streamlined dataset loading, augmentation, and optimization. After training, the model's best-performing weights were saved as best.pt for use in inference and deployment.
 
+<p align="center">
+  <img src="media/Yolov8-training" alt="YOLOv8 Training" width="500"/>
+</p>
 
 ---
 
@@ -79,7 +82,7 @@ A lightweight demo was developed to run the trained YOLOv8 model in real-time:
 </p>
 
 
-## 🎯 Fiducial Markers
+## Fiducial Markers
 
 Fiducial markers were used to uniquely identify blocks in the scene for detection and classification. They offer the advantage of not relying on colour, which is highly distorted by differing lighting settings. However, they are affected more by occlusion. Two types were explored: **QR codes** and **AprilTags**.
 
@@ -90,7 +93,7 @@ Fiducial markers were used to uniquely identify blocks in the scene for detectio
 QR codes were initially tested due to their widespread recognition and built-in data encoding. For detection, OpenCV’s `QRCodeDetector` was used to generate, identify, and decode the markers. Each QR code was encoded with the corresponding block color, allowing the system to read and associate color data directly from the code. Due to the small size of the blocks, the QR codes were printed to be 4 cm per dimension.
 
 <p align="center">
-  <img src=" " alt="QR Labeling" width="500"/>
+  <img src="media/qrcode.png" alt="QR Labeling" width="500"/>
 </p>
 
 However, QR codes proved to be extremely unreliable:
@@ -118,23 +121,46 @@ To improve the performance of the algorhtimn, more steps were taken in preproces
    Each valid contour is expanded with a margin and zoomed in.
 9. **Detect and Drawing Results:**  
    The detecti=ion is run on every zoomed in countour. If a detection occurs, a border is drawn around it and the data is decoded.
+   
+<p align="center">
+  <img src="media/flowchart.png" alt="Flowchart" width="500"/>
+  <br>
+  <img src="media/preprocess.png" alt="Preprocess" width="500"/>
+</p>
 
 
 While preprocessing significantly improved the effective detection range to approximately **1.3 meters**, it came with a tradeoff: increased computational cost. The zoom operation combined with running detection on multiple cropped regions made the pipeline resource-intensive, limiting performance on lower-end systems.
 
 ## AprilTags
-
-AprilTags, specifically from the `tag16h5` family, were used as the primary fiducial system. These markers are designed for robust visual detection under a variety of conditions and provide unique IDs for each tag.
-
-- High contrast design enables **accurate detection at various angles and distances**  
-- Tags were **physically printed and affixed to blocks**, making them easily distinguishable  
-- Well-supported by pose estimation libraries for future applications (e.g., 3D localization)
+In robotics and other computer vision applications, AprilTags proved very reliable at range and even under imperfect viewing conditions. Tags from the `tag16h5` family were tested as they encode the least data and easiest to decode. These markers are designed for robust visual detection under a variety of conditions and provide unique IDs for each tag.
 
 <p align="center">
-  <img src="./images/apriltags-example.png" alt="AprilTags Example" width="400"/>
+  <img src="media/preprocess.png" alt="April Tag Match" width="500"/>
 </p>
 
-AprilTags offered superior performance compared to QR codes, especially in dynamic or partially occluded environments, and were therefore used for all final annotations and training.
+The [pupil-apriltag](https://pypi.org/project/pupil-apriltags/) library was used to generate the AprilTags, each measuring 3 cm × 3 cm. Despite their small size, the tags proved effective even at distances of 3+ meters, far surpassing the performance of QR codes (~0.5m with preprocessing). Detection was also more stable, with less flickering and better handling of partial occlusion. However, it cannot negate the effects of heavy occlusion.
+
+<p align="center">
+  <img src="media/apriltag_1.png" alt="AprilTags Ex.1" width="400"/>
+  <img src="media/apriltag_4.png" alt="AprilTags Ex.1" width="400"/>
+
+</p>
+
+Even when angled, the detection handled it just fine until it was close to being perpendicular:
+
+<p align="center">
+  <img src="media/apriltag_3.png" alt="AprilTags Ex.1" width="400"/>
+</p>
+
+At a distance (~2m):
+
+<p align="center">
+  <img src="media/apriltag_2.png" alt="AprilTags Ex.1" width="400"/>
+</p>
+
+AprilTags offered superior performance compared to QR codes, especially in dynamic or partially occluded environments. 
+
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
