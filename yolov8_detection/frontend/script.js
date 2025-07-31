@@ -24,7 +24,7 @@ async function sendFrame() {
   const base64img = canvas.toDataURL('image/jpeg');
 
   try {
-    const response = await fetch('https://your-app.herokuapp.com/detect', {
+    const response = await fetch('https://app.herokuapp.com/detect', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ image: base64img })
