@@ -12,7 +12,6 @@ ID  BLOCK
 6   Red_2
 7   Yellow_1
 8   Yellow_2
-
 """
 
 import cv2 as cv

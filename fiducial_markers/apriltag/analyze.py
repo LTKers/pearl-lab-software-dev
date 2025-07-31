@@ -4,14 +4,16 @@ import time
 from apriltag_detector import detect_apriltag
 
 
-class analyze:
+class analyze_apriltag:
     def __init__(self):
         super().__init__()
         self.cap=cv.VideoCapture(0)
         self.previous_time = time.time()
+        self.run_program = True
+
 
     def run(self):
-        while True:
+        while self.run_program:
             ret, frame = self.cap.read()
             height, width = frame.shape[:2]
 
@@ -21,8 +23,8 @@ class analyze:
             
             # Fps calc + display
             current_time = time.time()
-            fps = 1 / (current_time - previous_time)
-            previous_time= current_time
+            fps = 1 / (current_time - self.previous_time)
+            self.previous_time= current_time
             cv.putText(frame, f"FPS: {fps:.2f}", (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
             #Gray Scale
@@ -75,10 +77,13 @@ class analyze:
 
                 cv.putText(frame, f"Tallest Tower: {tallest_height} blocks", (10, 70), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
                 
-            cv.imshow("QR Detection", frame)
+            # cv.imshow("QR Detection", frame)
 
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break
 
         self.cap.release()
         cv.destroyAllWindows()
+    
+    def stop(self):
+        self.run_program = False
