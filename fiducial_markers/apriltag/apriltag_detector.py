@@ -4,10 +4,14 @@ The AprilTags come from the family tag16h5.
 The list of AprilTags can be found here https://github.com/AprilRobotics/apriltag-imgs
 
 ID  BLOCK
-1   Blue
-2   Green
-3   Red
-4   Yellow
+1   Blue_1
+2   Blue_2
+3   Green_1
+4   Green_2
+5   Red_1
+6   Red_2
+7   Yellow_1
+8   Yellow_2
 
 """
 
@@ -32,18 +36,34 @@ def detect_apriltag(frame):
     for detection in detections:
         if detection.decision_margin > 80 and detection.tag_id < 4:
             if detection.tag_id == 0:
-                text_colour = 'blue';
+                text_colour = 'Blue_1';
                 bgr_colour = (255, 0, 0)
 
             elif detection.tag_id == 1:
-                text_colour = 'Green';
-                bgr_colour = (0, 255, 0)
+                text_colour = 'Blue_2';
+                bgr_colour = (255, 255, 0)
 
             elif detection.tag_id == 2:
-                text_colour = 'red';
-                bgr_colour = (0, 0, 255)
+                text_colour = 'Green_1';
+                bgr_colour = (0, 255, 0)
 
             elif detection.tag_id == 3:
+                text_colour = 'Green_2';
+                bgr_colour = (0, 255, 0)
+
+            elif detection.tag_id == 4:
+                text_colour = 'Red_1';
+                bgr_colour = (0, 0, 255)
+
+            elif detection.tag_id == 5:
+                text_colour = 'Red_2';
+                bgr_colour = (0, 0, 255)
+
+            elif detection.tag_id == 6:
+                text_colour = 'Yellow_1';
+                bgr_colour = (0, 255, 255)
+
+            elif detection.tag_id == 7:
                 text_colour = 'Yellow';
                 bgr_colour = (0, 255, 255)
 
