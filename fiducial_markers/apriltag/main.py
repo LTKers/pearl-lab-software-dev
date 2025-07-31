@@ -27,47 +27,45 @@ while True:
     gray_img=cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
     detections = detect_apriltag(gray_img)
 
-    id_list=[]
-    tower_dict={}
-    x_tolerance=30
-    tallest_x=0
+    id_list = []
+    tower_dict = {}
+    x_tolerance_multiplier = 1 # Will multiply this by the width of the AprilTag perceived in pixels
+    y_tolerance_multiplier = 4 # Will multiply this by the height of the AprilTag perceived in pixels
+
+    tallest_x = 0
+    tallest_height = None
 
     for detection in detections:
         pts = detection["points"]
-        color = detection["bgr_colour"]
-        
+        bgr_colour = detection["bgr_colour"]
+        text_colour = detection["text_colour"]
+
         center_point = ((pts[0][0] + pts[1][0] + pts[2][0] + pts[3][0])//4, (pts[0][1] + pts[1][1] + pts[2][1] + pts[3][1])//4)
 
-        if not color in id_list:
-            id_list.append([color, center_point, pts])
-            tower_dict[center_point[0]]=[[center_point[1], pts]]
+        if not bgr_colour in id_list:
+            id_list.append([bgr_colour, text_colour, center_point, pts])
+            tower_dict[center_point[0]]=[]
             
-    for color, (x, y), pts in id_list:
-        print("yo")
-
-        found = False
+    for bgr_colour, text_colour, (x, y), pts in id_list:
         for existing_x in list(tower_dict.keys()):
-            if abs(existing_x - x) <= x_tolerance:
-                tower_dict[existing_x].append([y, pts])
-
+            if abs(existing_x - x) <= x_tolerance_multiplier * (pts[0][1] - pts[3][1]):
+                tower_dict[existing_x].append([bgr_colour, text_colour, y, pts])
                 tallest_height = 0
                 tallest_x = None
 
-    for x_coord, y_list in tower_dict.items():
-        print("sigma")
-
-        height = len(y_list)
-        if height > tallest_height:
-            tallest_height = height
-            tallest_x = x_coord
+    if not tallest_height == None:
+        for x_coord, y_list in tower_dict.items():
+            height = len(y_list)
+            if height > tallest_height:
+                tallest_height = height
+                tallest_x = x_coord
 
     if tallest_x is not None and tallest_x in tower_dict:
-        print("second")
+        for bgr_colour, text_colour, y, pts in tower_dict[tallest_x]:
+            cv.polylines(frame, [pts], True, bgr_colour, 2)
+            cv.putText(frame, text_colour, (pts[0][0], pts[0][1] + 30), cv.FONT_HERSHEY_SIMPLEX, 0.7, bgr_colour, 2)
 
-        for y, pts in tower_dict[tallest_x]:
-            cv.polylines(frame, [pts], True, color, 2)
 
-        cv.putText(frame, detection["text_colour"], (pts[0][0], pts[0][1] + 30), cv.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
         cv.putText(frame, f"Tallest Tower: {tallest_height} blocks", (10, 70), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
         
     
