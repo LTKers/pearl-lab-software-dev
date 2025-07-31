@@ -41,7 +41,7 @@ def detect_apriltag(frame):
 
             elif detection.tag_id == 1:
                 text_colour = 'Blue_2';
-                bgr_colour = (255, 255, 0)
+                bgr_colour = (255, 0, 0)
 
             elif detection.tag_id == 2:
                 text_colour = 'Green_1';
