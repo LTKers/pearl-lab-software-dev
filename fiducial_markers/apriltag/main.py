@@ -32,7 +32,7 @@ while True:
     x_tolerance_multiplier = 1 # Will multiply this by the width of the AprilTag perceived in pixels
     y_tolerance_multiplier = 4 # Will multiply this by the height of the AprilTag perceived in pixels
 
-    tallest_x = 0
+    tallest_coords = 0
     tallest_height = None
 
     for detection in detections:
@@ -40,7 +40,7 @@ while True:
         bgr_colour = detection["bgr_colour"]
         text_colour = detection["text_colour"]
 
-        center_point = ((pts[0][0] + pts[1][0] + pts[2][0] + pts[3][0])//4, (pts[0][1] + pts[1][1] + pts[2][1] + pts[3][1])//4)
+        center_point = ((pts[0][0] + pts[1][0] + pts[2][0] + pts[3][0]) // 4, (pts[0][1] + pts[1][1] + pts[2][1] + pts[3][1]) // 4)
 
         if not bgr_colour in id_list:
             id_list.append([bgr_colour, text_colour, center_point, pts])
@@ -52,21 +52,22 @@ while True:
             avg_height = (abs((pts[0][1] - pts[3][1])) + (abs(pts[1][1] - pts[2][1]))) // 2
 
             if abs(existing_x - x) <= x_tolerance_multiplier * avg_width and abs(existing_y - y) <= y_tolerance_multiplier * avg_height:
-                tower_dict[(existing_x, existing_y)].append([bgr_colour, text_colour, y, pts])
+                tower_dict[(existing_x, existing_y)].append([bgr_colour, text_colour, (x,y), pts])
                 tallest_height = 0
-                tallest_x = None
+                tallest_coords = None
                 existing_x = x
                 existing_y = y
 
     if not tallest_height == None:
-        for x_coord, y_list in tower_dict.items():
+        for coords, y_list in tower_dict.items():
             height = len(y_list)
-            if height > tallest_height:
-                tallest_height = height
-                tallest_x = x_coord
 
-    if tallest_x is not None and tallest_x in tower_dict:
-        for bgr_colour, text_colour, y, pts in tower_dict[tallest_x]:
+            if height > tallest_height or height == tallest_height and coords[1] > tallest_coords[1]:
+                tallest_height = height
+                tallest_coords = coords
+
+    if tallest_coords is not None and tallest_coords in tower_dict:
+        for bgr_colour, text_colour, y, pts in tower_dict[tallest_coords]:
             cv.polylines(frame, [pts], True, bgr_colour, 2)
             cv.putText(frame, text_colour, (pts[0][0], pts[0][1] + 30), cv.FONT_HERSHEY_SIMPLEX, 0.7, bgr_colour, 2)
 
