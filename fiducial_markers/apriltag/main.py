@@ -2,9 +2,9 @@ import threading
 import sys
 import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDesktopWidget
-from PyQt5.QtCore import QTimer
 from main_window import MainWindow
 from analyze import analyze_apriltag
+
 def main():
     analyze = analyze_apriltag()
     analyze_thread=threading.Thread(target = analyze.run)
