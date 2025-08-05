@@ -11,17 +11,15 @@ def main():
     analyze_thread.start()
 
     app = QApplication(sys.argv)
-    """
-    style_path = os.path.join("style.qss")
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+
+    style_path = os.path.join(script_directory, "style.qss")
     with open(style_path) as f:
         app.setStyleSheet(f.read())
-    """
-
+    
     window = MainWindow(analyze)
-    window.dimension_signal.connect(analyze.update_initial_dimensions)
+    window.return_dimension.connect(analyze.center_crop_resize)
     window.show()
-
-
 
     exit_code = app.exec_()
     analyze_thread.join()
