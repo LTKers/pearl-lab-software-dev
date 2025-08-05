@@ -3,9 +3,8 @@
         "dataset",
         "model",
         "frontend",
-        "QR",
-        "AprilTag",
-        "Media",
+        "qr",
+        "apriltag",
         "media"
     ]
 }
