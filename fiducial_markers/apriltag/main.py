@@ -18,8 +18,10 @@ def main():
     """
 
     window = MainWindow(analyze)
+    window.dimension_signal.connect(analyze.update_initial_dimensions)
     window.show()
-    
+
+
 
     exit_code = app.exec_()
     analyze_thread.join()

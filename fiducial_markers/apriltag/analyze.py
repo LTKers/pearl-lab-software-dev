@@ -5,13 +5,15 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from apriltag_detector import detect_apriltag
 
 class analyze_apriltag(QObject):
-    
     feed_frame = pyqtSignal(object)
+
     def __init__(self):
         super().__init__()
-        self.cap=cv.VideoCapture(0)
+        self.cap = cv.VideoCapture(0)
         self.previous_time = time.time()
         self.run_program = True
+        self.inital_coords = [0, 0]
+
 
 
     def run(self):
@@ -27,7 +29,7 @@ class analyze_apriltag(QObject):
             current_time = time.time()
             fps = 1 / (current_time - self.previous_time)
             self.previous_time= current_time
-            cv.putText(frame, f"FPS: {fps:.2f}", (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            cv.putText(frame, f"FPS: {fps:.2f}", [self.inital_coords[0] + 10, self.inital_coords[1] + 30], cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
             #Gray Scale
             gray_img=cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
@@ -77,7 +79,7 @@ class analyze_apriltag(QObject):
                     cv.polylines(frame, [pts], True, bgr_colour, 2)
                     cv.putText(frame, text_colour, (pts[0][0], pts[0][1] + 30), cv.FONT_HERSHEY_SIMPLEX, 0.7, bgr_colour, 2)
 
-                cv.putText(frame, f"Tallest Tower: {tallest_height} blocks", (10, 70), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
+                cv.putText(frame, f"Tallest Tower: {tallest_height} blocks", [self.inital_coords[0] + 10, self.inital_coords[1] + 70 ], cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
                 
             # cv.imshow("QR Detection" , frame)
             RGB_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
@@ -89,5 +91,8 @@ class analyze_apriltag(QObject):
         self.cap.release()
         cv.destroyAllWindows()
     
+    def update_initial_dimensions(self, new_coords):
+        self.inital_coords = [int(new_coords[0]), int(new_coords[1])]
+
     def stop(self):
         self.run_program = False

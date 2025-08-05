@@ -1,10 +1,13 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDesktopWidget, QLabel, QSizePolicy, QWidget, QHBoxLayout
 from PyQt5.QtGui import QPixmap, QImage, QFontDatabase, QFont, QIcon
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QObject, pyqtSignal
+
 import cv2 as cv
 import math
 
-class MainWindow(QMainWindow):
+class MainWindow(QMainWindow, QObject):
+    dimension_signal = pyqtSignal(list)
+
     def __init__(self, analyze):
         super().__init__()
         self.setWindowTitle("AprilTag Demo")
@@ -24,9 +27,6 @@ class MainWindow(QMainWindow):
         self.analyze.feed_frame.connect(self.update_image)
 
     def initUI(self):
-        
-
-
 
         self.video_feed = QLabel(self)
         self.video_feed.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -41,7 +41,6 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(self.main_area_layout)
 
     def update_image(self, cv_img):
-        print(cv_img)
         target_width = self.video_feed.width()
         target_height = self.video_feed.height()
 
@@ -64,7 +63,12 @@ class MainWindow(QMainWindow):
         x_start = (new_w - target_width) // 2
         y_start = (new_h - target_height) // 2
 
-        cropped = resized[y_start:y_start + target_height, x_start:x_start + target_width]
+        cropped = resized[y_start : y_start + target_height, x_start : x_start + target_width]
+
+        orig_x_start = x_start / scale
+        orig_y_start = y_start / scale
+
+        self.dimension_signal.emit([orig_x_start, orig_y_start])
 
         return cropped
 
