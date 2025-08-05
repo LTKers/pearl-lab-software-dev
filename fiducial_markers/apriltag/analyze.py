@@ -1,10 +1,12 @@
 import cv2 as cv
 import numpy as np
 import time
+from PyQt5.QtCore import QObject, pyqtSignal
 from apriltag_detector import detect_apriltag
 
-
-class analyze_apriltag:
+class analyze_apriltag(QObject):
+    
+    feed_frame = pyqtSignal(object)
     def __init__(self):
         super().__init__()
         self.cap=cv.VideoCapture(0)
@@ -77,7 +79,9 @@ class analyze_apriltag:
 
                 cv.putText(frame, f"Tallest Tower: {tallest_height} blocks", (10, 70), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
                 
-            # cv.imshow("QR Detection", frame)
+            # cv.imshow("QR Detection" , frame)
+            RGB_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
+            self.feed_frame.emit(RGB_frame)
 
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break
