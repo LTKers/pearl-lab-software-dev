@@ -110,11 +110,6 @@ class analyze_apriltag(QObject):
 
         cropped = resized[y_start : y_start + target_height, x_start : x_start + target_width]
 
-        orig_x_start = x_start / scale
-        orig_y_start = y_start / scale
-        orig_x_end = (x_start + target_width) / scale
-        orig_y_end = (y_start + target_height) / scale
-
         self.updated_img = cropped
 
     def stop(self):
