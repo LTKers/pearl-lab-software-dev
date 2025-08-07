@@ -62,8 +62,15 @@ class analyze_apriltag(QObject):
                     avg_width = (abs((pts[0][0] - pts[1][0])) + abs((pts[2][0] - pts[3][0]))) // 2
                     avg_height = (abs((pts[0][1] - pts[3][1])) + (abs(pts[1][1] - pts[2][1]))) // 2
 
-                    if abs(existing_x - x) <= x_tolerance_multiplier * avg_width and abs(existing_y - y) <= y_tolerance_multiplier * avg_height:
-                        tower_dict[(existing_x, existing_y)].append([bgr_colour, text_colour, (x,y), pts])
+                    is_within_x = abs(existing_x - x) <= x_tolerance_multiplier * avg_width
+                    is_within_y = abs(existing_y - y) <= y_tolerance_multiplier * avg_height
+                    has_space_in_tower = len(tower_dict[(existing_x, existing_y)]) < 4
+                    
+                    tower_colors = [block[0] for block in tower_dict[(existing_x, existing_y)]]
+                    color_not_used = bgr_colour not in tower_colors
+
+                    if is_within_x and is_within_y and has_space_in_tower and color_not_used:
+                        tower_dict[(existing_x, existing_y)].append([bgr_colour, text_colour, (x, y), pts])
                         tallest_height = 0
                         tallest_coords = None
                         existing_x = x
