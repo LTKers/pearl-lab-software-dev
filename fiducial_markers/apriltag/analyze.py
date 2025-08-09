@@ -2,6 +2,7 @@ import cv2 as cv
 import numpy as np
 import time
 from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtWidgets import QDesktopWidget
 from apriltag_detector import detect_apriltag
 import math
 import numpy as np
@@ -15,8 +16,9 @@ class analyze_apriltag(QObject):
         self.cap = cv.VideoCapture(0)
         self.previous_time = time.time()
         self.run_program = True
-        self.inital_coords = [0, 0]
+        self.inital_coords = [0, 0] 
         self.updated_img = np.zeros((100, 100, 3), np.uint8)
+        self.center_point = [0, 0]
 
     def run(self):
         while self.run_program:
@@ -65,23 +67,39 @@ class analyze_apriltag(QObject):
                     is_within_x = abs(existing_x - x) <= x_tolerance_multiplier * avg_width
                     is_within_y = abs(existing_y - y) <= y_tolerance_multiplier * avg_height
                     has_space_in_tower = len(tower_dict[(existing_x, existing_y)]) < 4
-                    
-                    tower_colors = [block[0] for block in tower_dict[(existing_x, existing_y)]]
-                    color_not_used = bgr_colour not in tower_colors
+                    existing_index = None
 
-                    if is_within_x and is_within_y and has_space_in_tower and color_not_used:
-                        tower_dict[(existing_x, existing_y)].append([bgr_colour, text_colour, (x, y), pts])
-                        tallest_height = 0
+                    for i, (existing_bgr, _, (existing_x_pos, existing_y_pos), _) in enumerate(tower_dict[(existing_x, existing_y)]):
+                        if existing_bgr == bgr_colour:
+                            existing_index = i
+                            break
+
+                    if is_within_x and is_within_y:
+                        if existing_index is None:
+                            if has_space_in_tower:
+                                tower_dict[(existing_x, existing_y)].append([bgr_colour, text_colour, (x, y), pts])
+                        else:
+                            _, _, (_, existing_y_pos), _ = tower_dict[(existing_x, existing_y)][existing_index]
+                            new_tag_dist = math.dist(self.center_point, (existing_x_pos, existing_y_pos))
+                            current_tag_dist = math.dist(self.center_point, (x,y))
+
+                            if current_tag_dist > new_tag_dist:
+                                tower_dict[(existing_x, existing_y)][existing_index] = [bgr_colour, text_colour, (x, y), pts]
+
+                        tallest_tower_height = 0
                         tallest_coords = None
                         existing_x = x
                         existing_y = y
 
             if not tallest_height == None:
                 for coords, y_list in tower_dict.items():
-                    height = len(y_list)
+                    tower_height = len(y_list)
 
-                    if height > tallest_height or height == tallest_height and coords[1] > tallest_coords[1]:
-                        tallest_height = height
+                    new_tower_dist = math.dist(self.center_point, coords)
+                    current_tower_dist = math.dist(self.center_point, coords)
+
+                    if tower_height > tallest_tower_height or tower_height == tallest_tower_height and current_tower_dist > new_tower_dist:
+                        tallest_tower_height = height
                         tallest_coords = coords
 
             if tallest_coords is not None and tallest_coords in tower_dict:
@@ -117,6 +135,7 @@ class analyze_apriltag(QObject):
 
         cropped = resized[y_start : y_start + target_height, x_start : x_start + target_width]
 
+        self.center_point = [target_width/2, target_height/2]
         self.updated_img = cropped
 
     def stop(self):
