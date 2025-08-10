@@ -111,7 +111,6 @@ class analyze_apriltag(QObject):
                
                 cv.putText(self.updated_img, f"Tallest Tower: {tallest_height} blocks", [self.inital_coords[0] + 10, self.inital_coords[1] + 70 ], cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
                 
-            # cv.imshow("QR Detection" , frame)
             RGB_frame = cv.cvtColor(self.updated_img, cv.COLOR_BGR2RGB)
             self.feed_frame.emit(RGB_frame, self.tower_order)
 
