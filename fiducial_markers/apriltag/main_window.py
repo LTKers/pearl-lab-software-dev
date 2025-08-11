@@ -38,11 +38,28 @@ class MainWindow(QMainWindow, QObject):
         main_area_layout.addWidget(self.video_feed)
         self.central_widget.setLayout(main_area_layout)
 
+        self.right_area = QWidget()
+        self.right_area_layout = QVBoxLayout()
+        self.right_area.setLayout(self.right_area_layout)
+        main_area_layout.addWidget(self.right_area)
+        self.right_area.setFixedWidth(200)
+
+        self.top_right_area = QWidget()
+        self.top_right_area_layout=QHBoxLayout()
+        self.top_right_area.setLayout(self.top_right_area_layout)
+        self.top_right_area.setObjectName("top_right_area")
+        self.top_right_area.setFixedHeight(100)
+        self.right_area_layout.addWidget(self.top_right_area)
+
+        self.title = QLabel("AprilTag Demo", self)
+        self.top_right_area_layout.addWidget(self.title)
+        self.title.setObjectName("title")
+
         self.block_stack = QWidget()
         block_layout = QVBoxLayout()
         self.block_stack.setLayout(block_layout)
         block_layout.setDirection(QBoxLayout.BottomToTop)
-        main_area_layout.addWidget(self.block_stack)
+        self.right_area_layout.addWidget(self.block_stack)
 
         self.blocks = []
         self.block_pxmaps = []
@@ -53,6 +70,9 @@ class MainWindow(QMainWindow, QObject):
         self.yellow = QPixmap(os.path.join(script_directory, "images", "web_blocks", "yellow.png"))
         self.green = QPixmap(os.path.join(script_directory, "images", "web_blocks", "green.png"))
         self.transparent = QPixmap(os.path.join(script_directory, "images", "web_blocks", "transparent.png"))
+
+      
+
 
         for i in range(4):
             block_label = QLabel(self)
