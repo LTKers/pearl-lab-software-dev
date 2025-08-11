@@ -6,3 +6,13 @@
 QMainWindow{
     background-color: #A3D5FF;
 }
+
+#top_right_area {
+    background-color: #6F73D2;
+}
+
+#title{
+    font-size: 18px;
+    font-weight: bold;
+    color: #D9F0FF;
+}
