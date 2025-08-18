@@ -63,7 +63,7 @@ def detect_apriltag(frame):
                 bgr_colour = (0, 255, 255)
 
             elif detection.tag_id == 7:
-                text_colour = 'Yellow';
+                text_colour = 'Yellow_2';
                 bgr_colour = (0, 255, 255)
 
             else:
