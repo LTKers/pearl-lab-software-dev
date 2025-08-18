@@ -37,8 +37,8 @@ class analyze_apriltag(QObject):
             cv.putText(self.updated_img, f"FPS: {fps:.2f}", [self.inital_coords[0] + 10, self.inital_coords[1] + 30], cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
             #Gray Scale
-            gray_img=cv.cvtColor(self.updated_img, cv.COLOR_BGR2GRAY)
-            detections = detect_apriltag(gray_img)
+            self.gray_img=cv.cvtColor(self.updated_img, cv.COLOR_BGR2GRAY)
+            detections = detect_apriltag(self.gray_img)
 
             id_list = []
             tower_dict = {}
@@ -69,8 +69,8 @@ class analyze_apriltag(QObject):
                     has_space_in_tower = len(tower_dict[(existing_x, existing_y)]) < 4
                     existing_index = None
 
-                    for i, (existing_bgr, _, (existing_x_pos, existing_y_pos), _) in enumerate(tower_dict[(existing_x, existing_y)]):
-                        if existing_bgr == bgr_colour:
+                    for i, (_, existing_text_bgr, (existing_x_pos, existing_y_pos), _) in enumerate(tower_dict[(existing_x, existing_y)]):
+                        if existing_text_bgr == text_colour:
                             existing_index = i
                             break
 
@@ -78,6 +78,7 @@ class analyze_apriltag(QObject):
                         if existing_index is None:
                             if has_space_in_tower:
                                 tower_dict[(existing_x, existing_y)].append([bgr_colour, text_colour, (x, y), pts])
+
                         else:
                             _, _, (_, existing_y_pos), _ = tower_dict[(existing_x, existing_y)][existing_index]
                             new_tag_dist = math.dist(self.center_point, (existing_x_pos, existing_y_pos))
@@ -90,17 +91,24 @@ class analyze_apriltag(QObject):
                         tallest_coords = None
                         existing_x = x
                         existing_y = y
+                        
 
-            if not tallest_height == None:
-                for coords, y_list in tower_dict.items():
-                    tower_height = len(y_list)
 
-                    new_tower_dist = math.dist(self.center_point, coords)
-                    current_tower_dist = math.dist(self.center_point, coords)
 
-                    if tower_height > tallest_tower_height or tower_height == tallest_tower_height and current_tower_dist > new_tower_dist:
-                        tallest_tower_height = height
-                        tallest_coords = coords
+            for coords, y_list in tower_dict.items():
+
+                if tallest_coords == None:
+                    tallest_coords = coords
+
+                tower_height = len(y_list)
+
+                new_tower_dist = math.dist(self.center_point, coords)
+                current_tower_dist = math.dist(self.center_point, tallest_coords)
+
+                if tower_height > tallest_tower_height or tower_height == tallest_tower_height and current_tower_dist >= new_tower_dist:
+                    tallest_tower_height = tower_height
+                    tallest_coords = coords
+                    current_tower_dist = new_tower_dist
 
             if tallest_coords is not None and tallest_coords in tower_dict:
                 for bgr_colour, text_colour, y, pts in tower_dict[tallest_coords]:
@@ -109,8 +117,9 @@ class analyze_apriltag(QObject):
                     self.tower_order.append(text_colour)
 
                
-                cv.putText(self.updated_img, f"Tallest Tower: {tallest_height} blocks", [self.inital_coords[0] + 10, self.inital_coords[1] + 70 ], cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
-                
+                cv.putText(self.updated_img, f"Tallest Tower: {tallest_tower_height} blocks", [self.inital_coords[0] + 10, self.inital_coords[1] + 70 ], cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
+                cv.circle(self.updated_img, self.center_point, 2, (0, 0, 255), 2, 2)
+                          
             RGB_frame = cv.cvtColor(self.updated_img, cv.COLOR_BGR2RGB)
             self.feed_frame.emit(RGB_frame, self.tower_order)
 
@@ -134,8 +143,11 @@ class analyze_apriltag(QObject):
 
         cropped = resized[y_start : y_start + target_height, x_start : x_start + target_width]
 
-        self.center_point = [target_width/2, target_height/2]
+        self.center_point = (target_width//2, target_height//2)
         self.updated_img = cropped
+        
+    def update_res(self, new_width, new_height):
+        self.gray_img = cv.resize(self.gray_img, (new_width, new_height), interpolation = cv.INTER_LINEAR)
 
     def stop(self):
         self.run_program = False
