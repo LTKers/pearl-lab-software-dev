@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDesktopWidget, QLabel, QSizePolicy, QWidget, QHBoxLayout, QVBoxLayout, QBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QDesktopWidget, QLabel, QSizePolicy, QWidget, QHBoxLayout, QVBoxLayout, QBoxLayout, QGridLayout, QLineEdit, QPushButton
 from PyQt5.QtGui import QPixmap, QImage, QFontDatabase, QFont, QIcon
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
 import cv2 as cv
@@ -11,7 +11,6 @@ class MainWindow(QMainWindow, QObject):
     def __init__(self, analyze):
         super().__init__()
         self.setWindowTitle("AprilTag Demo")
-        self.initUI()
         self.tower_list=[]
         self.analyze = analyze
 
@@ -26,6 +25,9 @@ class MainWindow(QMainWindow, QObject):
 
         self.analyze.dimension_signal.connect(self.get_dimensions)
         self.analyze.feed_frame.connect(self.update_window)
+
+        self.initUI()
+
 
     def initUI(self):
         self.video_feed = QLabel(self)
@@ -71,8 +73,34 @@ class MainWindow(QMainWindow, QObject):
         self.green = QPixmap(os.path.join(script_directory, "images", "web_blocks", "green.png"))
         self.transparent = QPixmap(os.path.join(script_directory, "images", "web_blocks", "transparent.png"))
 
-      
+        self.settings_area = QWidget()
+        self.settings_layout = QGridLayout()
+        self.settings_area.setLayout(self.settings_layout)
+        self.settings_layout.setVerticalSpacing(10)
+        self.settings_area.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
+        self.right_area_layout.addWidget(self.settings_area, alignment=Qt.AlignBottom)
 
+        self.resolution_text = QLabel("Resolution")
+        self.settings_layout.addWidget(self.resolution_text, 0, 0)
+
+        self.width_text = QLabel("Width (px):")
+        self.width_input = QLineEdit()
+        self.settings_layout.addWidget(self.width_text, 1, 0)
+        self.settings_layout.addWidget(self.width_input, 1, 1)
+
+        self.height_text = QLabel("Height (px):")
+        self.height_input = QLineEdit()
+        self.settings_layout.addWidget(self.height_text, 2, 0)
+        self.settings_layout.addWidget(self.height_input, 2, 1)
+
+        self.set_res = QPushButton("Set Resolution", self)
+        self.settings_layout.addWidget(self.set_res, 3, 0)
+        self.set_res.clicked.connect(
+            lambda: self.analyze.update_res(
+                int(self.width_input.text() or 0),
+                int(self.height_input.text() or 0)
+            )
+        )
 
         for i in range(4):
             block_label = QLabel(self)
@@ -99,7 +127,6 @@ class MainWindow(QMainWindow, QObject):
             self.setBlockImg(color, i)
 
     def setBlockImg(self, colour, index):
-        print(colour[0:-2])
         match colour[0:-2]:
             case "Red":
                 self.blocks[index].setPixmap(self.red)
