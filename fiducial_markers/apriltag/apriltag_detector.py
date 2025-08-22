@@ -12,6 +12,8 @@ ID  BLOCK
 6   Red_2
 7   Yellow_1
 8   Yellow_2
+
+This script runs the pupil_apriltags library detection with basic margin/confidence and ID filtering.
 """
 
 import cv2 as cv
@@ -29,7 +31,7 @@ apriltag_detector = pat.Detector(
 
 
 def detect_apriltag(frame):
-    detections = apriltag_detector.detect(frame, estimate_tag_pose=False)
+    detections = apriltag_detector.detect(frame, estimate_tag_pose = False)
     
     results = []
     for detection in detections:
@@ -69,11 +71,12 @@ def detect_apriltag(frame):
             else:
                 text_colour = 'null';
                 bgr_colour = (0, 0, 0)
-
+            
             results.append({
                 "text_colour": text_colour,
                 "bgr_colour": bgr_colour,
-                "points": detection.corners.astype(int)
+                "points": detection.corners.astype(int),
+                "decision_margin": detection.decision_margin
             })
 
     return results
