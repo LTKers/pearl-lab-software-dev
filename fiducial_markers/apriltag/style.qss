@@ -1,3 +1,4 @@
+/* Basic QSS styling for GUI */
 *{
     margin: 0;
     padding: 0;
@@ -15,4 +16,17 @@ QMainWindow{
     font-size: 18px;
     font-weight: bold;
     color: #D9F0FF;
+}
+
+#set_res{
+    padding: 7px;
+    background: #6F73D2;
+    color: #D9F0FF;
+    font-size: 12px;
+    border-radius: 10px
+}
+
+#error{
+    color: #FF0000;
+    font-size: 12px;
 }
