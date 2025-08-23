@@ -6,6 +6,7 @@ from main_window import MainWindow
 from analyze import analyze_apriltag
 
 def main():
+    # GUI and detection needs to run on seperate threads
     analyze = analyze_apriltag()
     analyze_thread=threading.Thread(target = analyze.run)
     analyze_thread.start()
