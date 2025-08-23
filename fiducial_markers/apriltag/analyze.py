@@ -8,6 +8,7 @@ import math
 import numpy as np
 
 class analyze_apriltag(QObject):
+    # Commmunication between analyze.py and MainWindow GUI
     dimension_signal = pyqtSignal(object)
     feed_frame = pyqtSignal(object, list)
 
@@ -23,7 +24,6 @@ class analyze_apriltag(QObject):
     def run(self):
         while self.run_program:
             ret, self.frame = self.cap.read()
-            height, width = self.frame.shape[:2]
             self.tower_order=[]
 
             if not ret:
@@ -36,9 +36,12 @@ class analyze_apriltag(QObject):
             self.previous_time= current_time
             cv.putText(self.updated_img, f"FPS: {fps:.2f}", [self.inital_coords[0] + 10, self.inital_coords[1] + 30], cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-            #Gray Scale
+            # Gray Scale (Detection library takes in grayscaled image)
             self.gray_img=cv.cvtColor(self.updated_img, cv.COLOR_BGR2GRAY)
-            detections = detect_apriltag(self.gray_img)
+            self.detections = detect_apriltag(self.gray_img)
+
+            if not len(self.detections) == 0:
+                self.calc_avg_confidence()
 
             id_list = []
             tower_dict = {}
@@ -46,9 +49,8 @@ class analyze_apriltag(QObject):
             y_tolerance_multiplier = 4 # Will multiply this by the height of the AprilTag perceived in pixels
 
             tallest_coords = 0
-            tallest_height = None
-
-            for detection in detections:
+            
+            for detection in self.detections:
                 pts = detection["points"]
                 bgr_colour = detection["bgr_colour"]
                 text_colour = detection["text_colour"]
@@ -92,9 +94,6 @@ class analyze_apriltag(QObject):
                         existing_x = x
                         existing_y = y
                         
-
-
-
             for coords, y_list in tower_dict.items():
 
                 if tallest_coords == None:
@@ -118,6 +117,7 @@ class analyze_apriltag(QObject):
 
                
                 cv.putText(self.updated_img, f"Tallest Tower: {tallest_tower_height} blocks", [self.inital_coords[0] + 10, self.inital_coords[1] + 70 ], cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
+                cv.putText(self.updated_img, f"Avg Decision Margin: {self.avg_decision_margin}", [self.inital_coords[0] + 10, self.inital_coords[1] + 110 ], cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
                 cv.circle(self.updated_img, self.center_point, 2, (0, 0, 255), 2, 2)
                           
             RGB_frame = cv.cvtColor(self.updated_img, cv.COLOR_BGR2RGB)
@@ -130,6 +130,7 @@ class analyze_apriltag(QObject):
         self.cap.release()
         cv.destroyAllWindows()
 
+    # Crop output image so it fits onto MainWindow GUI
     def center_crop_resize(self, target_dimensions):
         h, w, _ = self.frame.shape
         target_width=target_dimensions[0]
@@ -149,5 +150,8 @@ class analyze_apriltag(QObject):
     def update_res(self, new_width, new_height):
         self.gray_img = cv.resize(self.gray_img, (new_width, new_height), interpolation = cv.INTER_LINEAR)
 
+    def calc_avg_confidence(self):
+        self.avg_decision_margin = sum([detection["decision_margin"] for detection in self.detections])/len(self.detections)
+        
     def stop(self):
         self.run_program = False
