@@ -5,6 +5,8 @@ import cv2 as cv
 import math
 import os
 
+# GUI Design
+
 class MainWindow(QMainWindow, QObject):
     return_dimension = pyqtSignal(list)
 
@@ -80,6 +82,13 @@ class MainWindow(QMainWindow, QObject):
         self.settings_area.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
         self.right_area_layout.addWidget(self.settings_area, alignment=Qt.AlignBottom)
 
+        for i in range(4):
+            block_label = QLabel(self)
+            block_label.setPixmap(self.transparent)
+            block_label.setFixedSize(100, 100)
+            block_layout.addWidget(block_label)
+            self.blocks.append(block_label)
+
         self.resolution_text = QLabel("Resolution")
         self.settings_layout.addWidget(self.resolution_text, 0, 0)
 
@@ -87,13 +96,18 @@ class MainWindow(QMainWindow, QObject):
         self.width_input = QLineEdit()
         self.settings_layout.addWidget(self.width_text, 1, 0)
         self.settings_layout.addWidget(self.width_input, 1, 1)
+        self.width_input.editingFinished.connect(lambda: self.validate_res(self.width_input.text(), self.width_input))
 
         self.height_text = QLabel("Height (px):")
         self.height_input = QLineEdit()
         self.settings_layout.addWidget(self.height_text, 2, 0)
         self.settings_layout.addWidget(self.height_input, 2, 1)
+        self.height_input.editingFinished.connect(lambda: self.validate_res(self.height_input.text(), self.height_input))
 
         self.set_res = QPushButton("Set Resolution", self)
+        self.set_res.adjustSize()
+
+        self.set_res.setObjectName("set_res")
         self.settings_layout.addWidget(self.set_res, 3, 0)
         self.set_res.clicked.connect(
             lambda: self.analyze.update_res(
@@ -102,19 +116,17 @@ class MainWindow(QMainWindow, QObject):
             )
         )
 
-        for i in range(4):
-            block_label = QLabel(self)
-            block_label.setPixmap(self.transparent)
-            block_label.setFixedSize(100, 100)
-            block_layout.addWidget(block_label)
-            self.blocks.append(block_label)
+        self.error_text = QLabel("")
+        self.error_text.setObjectName("error")
+        self.settings_layout.addWidget(self.error_text)
 
-      
+    # Communication between gui and analyze.py.
     def get_dimensions(self, obj):
         target_width = self.video_feed.width()
         target_height = self.video_feed.height()
         self.return_dimension.emit([target_width, target_height])
 
+    # Img needs to be cropped from center.
     def update_window(self, cv_img, tower_list):
         h, w, ch = cv_img.shape
         bytes_per_line = ch * w
@@ -143,6 +155,19 @@ class MainWindow(QMainWindow, QObject):
             case _:
                 self.blocks[index].setPixmap(self.transparent)
 
+    # Makes sure all threads are stopped
     def closeEvent(self, event):
         self.analyze.stop()
         return super().closeEvent(event)
+    
+    # Ensure resolution set is appropriate
+    def validate_res(self, value, input_field):
+        if not value.isdigit() or int(value) < 0:
+            input_field.setText("100")
+            self.error_text.setText("ERROR")
+        else:
+            self.error_text.setText("")
+
+            
+        
+
