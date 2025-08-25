@@ -35,7 +35,7 @@ def detect_apriltag(frame):
     
     results = []
     for detection in detections:
-        if detection.decision_margin > 80 and detection.tag_id < 9:
+        if detection.decision_margin > 50 and detection.tag_id < 9:
             if detection.tag_id == 0:
                 text_colour = 'Blue_2';
                 bgr_colour = (255, 0, 0)
